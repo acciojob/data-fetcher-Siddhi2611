@@ -3,45 +3,37 @@ import './../styles/App.css';
 
 const App = () => {
   const [data, setData] = useState(null);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Try fetching from API
     fetch("/data")
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Network response was not ok");
+          throw new Error("Failed to fetch data");
         }
         return response.json();
       })
       .then((jsonData) => {
-        // If no data or empty products
-        if (!jsonData || !jsonData.products || jsonData.products.length === 0) {
-          setData([]);
-        } else {
-          setData(jsonData.products);
-        }
+        setData(jsonData);
       })
       .catch((err) => {
-        setError(err.message || "Unknown error");
-      })
-      .finally(() => {
-        setLoading(false);
+        setError(err.message);
       });
   }, []);
 
   return (
     <div>
       {/* Do not remove the main div */}
-      {loading && <p>Loading data...</p>}
-      {!loading && error && <p>An error occurred: {error}</p>}
-      {!loading && !error && data && data.length === 0 && <p>[]</p>}
-      {!loading && !error && data && data.length > 0 && (
-        <div>
-          <h2>Data Fetched from API</h2>
+      {error ? (
+        <p>Error: {error}</p>
+      ) : data ? (
+        data.length === 0 ? (
+          <p>No data found</p>
+        ) : (
           <pre>{JSON.stringify(data, null, 2)}</pre>
-        </div>
+        )
+      ) : (
+        <p>Loading...</p>
       )}
     </div>
   );
