@@ -8,7 +8,7 @@ const App = () => {
 
   useEffect(() => {
     // Try fetching from API
-    fetch("https://dummyjson.com/products")
+    fetch("http://dummyjson.com/products")
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
