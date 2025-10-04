@@ -2,29 +2,29 @@ import React, { useState, useEffect } from "react";
 import './../styles/App.css';
 
 const App = () => {
-  const [data, setData] = useState(null); // to store API data
-  const [loading, setLoading] = useState(true); // loading state
-  const [error, setError] = useState(null); // error state
+  const [data, setData] = useState(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch data using .then() to avoid regeneratorRuntime issue
+    // Try fetching from API
     fetch("https://dummyjson.com/products")
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Failed to fetch data");
+          throw new Error("Network response was not ok");
         }
         return response.json();
       })
       .then((jsonData) => {
-        // Handle empty or missing data
+        // If no data or empty products
         if (!jsonData || !jsonData.products || jsonData.products.length === 0) {
-          setData(null);
+          setData([]);
         } else {
-          setData(jsonData);
+          setData(jsonData.products);
         }
       })
       .catch((err) => {
-        setError(err.message);
+        setError(err.message || "Unknown error");
       })
       .finally(() => {
         setLoading(false);
@@ -35,9 +35,14 @@ const App = () => {
     <div>
       {/* Do not remove the main div */}
       {loading && <p>Loading data...</p>}
-      {error && <p>Error: {error}</p>}
-      {!loading && !error && !data && <p>No data found</p>}
-      {data && <pre>{JSON.stringify(data, null, 2)}</pre>}
+      {!loading && error && <p>An error occurred: {error}</p>}
+      {!loading && !error && data && data.length === 0 && <p>[]</p>}
+      {!loading && !error && data && data.length > 0 && (
+        <div>
+          <h2>Data Fetched from API</h2>
+          <pre>{JSON.stringify(data, null, 2)}</pre>
+        </div>
+      )}
     </div>
   );
 };
